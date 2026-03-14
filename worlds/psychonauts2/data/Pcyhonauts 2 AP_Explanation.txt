@@ -1,0 +1,43 @@
+﻿Using the branched project of Archipelago, I am attempting to create an Archipelago for Psychonauts 2.
+
+
+It will be based on the existing Psychonauts 1 Archipelago:
+
+
+https://github.com/Akashortstack/Psychonauts-AP-Integration
+
+
+And it will work with an Archipelago mod for Psychonauts 2 that will be created later.
+
+
+The repository uses the CSVs called “Psychonauts_2_Check_List”, “Psychonauts_2_Item_List”, and “Psychonauts_2_WinConditions”.  These CSV files have the list of checks and Items in Psychonauts 2, as well as their requirements they are locked behind.  There is also a CSV with Win Conditions and their necessary Items to activate the game completion.  The Win Conditions will be included as options in the Player Yaml file.
+
+
+The four outfits in the game, (normal, skivvies, OG, and suit) are options within the player Yaml.  Players can choose which one to start with and the others will be shuffled into the item pool.
+
+
+If a Win Condition requires a specific Item, then the Item_Type for that item will change to Required when generating the Archipelago Seed and will be labeled as such in the Spoiler Log.  All Required Items must be found in order to activate the Win Condition and beat the Archipelago Randomizer Seed.
+
+
+The Maligula fight is activated by obtaining the required items, and then interacting with the Astralathe in Green Needle Gulch.
+
+
+The areas Motherlobe, Quarry, Questionable Area, and Green Needle Gulch must be in the “Game complete” state as if after facing the final boss.  However, Mental Worlds must be in the state of entering them for the first time.  (This probably needs to be changed to have real world hub areas in the state of Full Thinkerprint Access after meeting the family, but with Green Needle Gulch unlocked.)
+
+
+For the Psychic Abilities (Telekinesis, Psi Blast, Pyrokinesis, Levitation, Clairvoyance, Mental Connection, Time Bubble, and Projection), they will act as a progressive item.  The first of its type that is found (e.g. Telekinesis, Telekinesis_Upgrade1, Telekinesis_Upgrade2, or Telekinesis_Upgrade3) will give the player the first upgrade for that Ability.  Each one found after this increases the upgraded version of that Psychic Ability.  This way, the player can find any Psychic Ability check and make sure they get at least the base version of it.
+
+
+This same logic for Progressive Items is also true for MindsEyelets/Expandolier, FluffPockets/JumboFluffPouch, and PsifoldWallet/AstralWallet.
+
+
+Figments are cut into 20% chunks per check instead of a check on each individual figment.  So there are checks for 20%, 40%, 60%, 80%, and 100% of figments.
+
+
+Starting logic is based on vanilla game, with only what's included at the start before Dental Door in Loboto.  So the player starts with Melee, Climb, Acrobatics, and Double-Jump.
+
+
+This Psychonauts 2 Archipelago randomizer is intended to work with a mod for the game.  The game runs on Unreal Engine 4.  The mod will be made after this Archipelago project is made.  In the mod, there are some changes to the normal game logic that will be accounted for.  Mental Connection will not be required in the Collective Unconscious.  Players will always start with at least one Mental World open, and one hub area (Motherlobe, Quarry, Questionable Area, and Green Needle Gulch) open.  Players spawn in the Collective Unconscious.
+
+
+For the Psychonauts 2 Mod, Players will be allowed to use Smelling Salts to exit any mental world or the Collective Unconscious.  If the player does not have access to a hub area that includes a Brain Tumbler (Motherlobe and Green Needle Gulch), when using Smelling Slats, the player will spawn in an available hub area.  If a player is in a Mental World and uses Smelling Salts, they will be taken to the Collective Unconscious first.  They can use the Smelling Salts again to leave the Collective Unconscious and exit to an available Hub area.  Motherlobe or Green Needle Gulch, will always be preferred to spawn when using Smelling Salts to exit the Collective Unconscious, whichever one the player used the Brain Tumbler at last and is currently available to the player.
