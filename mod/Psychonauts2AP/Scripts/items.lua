@@ -9,10 +9,8 @@
 ---   When the source CSV contains multiple items with identical base names,
 ---   a type suffix (e.g. "(Half-a-Mind)", "(Purse Tag)") is appended, matching
 ---   the logic in Python items.py _item_type_suffix_from_key().  Items that
----   still share a display name after disambiguation (e.g. all three HC_Nuggets
----   have the same CSV name) are treated as copies of the same AP item and
----   share the first occurrence's ID.  The AP server only ever sends the
----   shared ID, so those duplicate IDs never appear in received-items messages.
+---   still share a display name after disambiguation are treated as copies of
+---   the same AP item and share the first occurrence's ID.
 ---
 --- PROGRESSIVE ITEMS:
 ---   Eight psychic abilities and three inventory-upgrade pairs are progressive.
@@ -225,7 +223,9 @@ Items.id_to_name = {
     [7792650] = "Loboto's Labrynth Purse",  -- Loboto_Purse
     [7792651] = "Loboto's Labrynth Steamer Trunk",  -- Loboto_SteamerTrunk
     [7792652] = "Loboto's Labrynth Dufflebag",  -- Loboto_Dufflebag
-    [7792653] = "Hollis' Classroom Nugget of Wisdom 1 (Nugget of Wisdom)",  -- HC_Nugget1
+    [7792653] = "Hollis' Classroom Nugget of Wisdom 1",  -- HC_Nugget1
+    [7792654] = "Hollis' Classroom Nugget of Wisdom 2",  -- HC_Nugget2
+    [7792655] = "Hollis' Classroom Nugget of Wisdom 3",  -- HC_Nugget3
     [7792656] = "Hollis' Classroom Half-a-Mind 1",  -- HC_HAM1
     [7792657] = "Hollis' Classroom Half-a-Mind 2",  -- HC_HAM2
     [7792658] = "Hollis' Classroom Memory Vault 1",  -- HC_MemoryVault1
