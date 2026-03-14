@@ -13,8 +13,6 @@ Requirement string grammar (informal):
   - "NULL" or empty string means no requirement.
 
 Item-key normalisation:
-  - "Thought_Tuner" → "ThoughtTuner" (CSV naming inconsistency)
-  - "PyroKinesis"   → "Pyrokinesis"  (typo in the check CSV)
   - Progressive-group CSV keys are mapped to their progressive display names
     (e.g. "MentalConnection_Upgrade3" → "Progressive Mental Connection" count 4)
 
@@ -41,14 +39,8 @@ from .items import (
 )
 
 # ---------------------------------------------------------------------------
-# Requirement-key normalisation
+# Progressive-item count table
 # ---------------------------------------------------------------------------
-
-# Fixes for naming inconsistencies between the check CSV and the item CSV.
-_KEY_CORRECTIONS: Dict[str, str] = {
-    "Thought_Tuner": "ThoughtTuner",  # check CSV uses underscore; item CSV is camelCase
-    "PyroKinesis":   "Pyrokinesis",   # capital K typo in some check CSV rows
-}
 
 # How many copies of a progressive item each upgrade level requires.
 # base ability = 1 copy found, _Upgrade1 = 2 copies found, …
@@ -63,9 +55,8 @@ _PROGRESSIVE_COUNTS: Dict[str, Tuple[str, int]] = {
     "PsiBlast_Upgrade1":         ("Progressive Psi Blast", 2),
     "PsiBlast_Upgrade2":         ("Progressive Psi Blast", 3),
     "PsiBlast_Upgrade3":         ("Progressive Psi Blast", 4),
-    # Pyrokinesis (also accept the typo variant)
+    # Pyrokinesis
     "Pyrokinesis":               ("Progressive Pyrokinesis", 1),
-    "PyroKinesis":               ("Progressive Pyrokinesis", 1),
     "Pyrokinesis_Upgrade1":      ("Progressive Pyrokinesis", 2),
     "Pyrokinesis_Upgrade2":      ("Progressive Pyrokinesis", 3),
     "Pyrokinesis_Upgrade3":      ("Progressive Pyrokinesis", 4),
@@ -104,11 +95,6 @@ _PROGRESSIVE_COUNTS: Dict[str, Tuple[str, int]] = {
 }
 
 
-def _normalize_key(key: str) -> str:
-    """Apply CSV naming corrections to a single item key."""
-    return _KEY_CORRECTIONS.get(key, key)
-
-
 # ---------------------------------------------------------------------------
 # Single-token rule builder
 # ---------------------------------------------------------------------------
@@ -118,13 +104,11 @@ CollectionRule = Callable[["CollectionState"], bool]
 
 def _rule_for_key(key: str, player: int) -> CollectionRule:
     """
-    Return a CollectionRule for a single normalised item key.
+    Return a CollectionRule for a single item key.
 
     Handles progressive items (by count), the All_ScavHunt_Items macro, and
     plain items.
     """
-    key = _normalize_key(key)
-
     # ── Scavenger-hunt macro ─────────────────────────────────────────────────
     if key == "All_ScavHunt_Items":
         # Require all 16 scavenger-hunt collectibles.

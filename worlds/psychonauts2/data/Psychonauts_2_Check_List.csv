@@ -22,8 +22,8 @@ Index,Location,Section,Check,Name,Item_Required
 20,Motherlobe,NULL,ML_PsiCard21_Check,Mailroom Upper Conveyor,Motherlobe_Access
 21,Motherlobe,NULL,ML_PsiCard22_Check,Mailroom Upper Conveyor 2,Motherlobe_Access
 22,Motherlobe,NULL,ML_PsiCard23_Check,Ford's Barbershop,Motherlobe_Access
-23,Motherlobe,NULL,ML_PsiCard24_Check,Atrium Floating Platform 1,"MentalConnection, Motherlobe_Access, Thought_Tuner"
-24,Motherlobe,NULL,ML_PsiCard25_Check,Atrium Floating Platform 2,"MentalConnection, Motherlobe_Access, Thought_Tuner"
+23,Motherlobe,NULL,ML_PsiCard24_Check,Atrium Floating Platform 1,"MentalConnection, Motherlobe_Access, ThoughtTuner"
+24,Motherlobe,NULL,ML_PsiCard25_Check,Atrium Floating Platform 2,"MentalConnection, Motherlobe_Access, ThoughtTuner"
 25,Motherlobe,NULL,ML_PsiCard26_Check,Bowling Alley Shoe Counter,"Motherlobe_Access, Senior_League_Card"
 26,Motherlobe,NULL,ML_PsiCard27_Check,Bowling Alley Lane,"Motherlobe_Access, Senior_League_Card"
 27,Motherlobe,NULL,ML_SupplyChests1_Check,Noodle Bar,Motherlobe_Access
@@ -42,7 +42,7 @@ Index,Location,Section,Check,Name,Item_Required
 40,Motherlobe,NULL,ML_PsyChallengeMarkers2_Check,Noodle Bar,Motherlobe_Access
 41,Motherlobe,NULL,ML_PsyChallengeMarkers3_Check,Intern Classroom,Motherlobe_Access
 42,Motherlobe,NULL,ML_PsyChallengeMarkers4_Check,Truman's Boardroom,Motherlobe_Access
-43,Motherlobe,NULL,ML_PsyChallengeMarkers5_Check,Atrium Floating Platform,"MentalConnection, Motherlobe_Access, Thought_Tuner"
+43,Motherlobe,NULL,ML_PsyChallengeMarkers5_Check,Atrium Floating Platform,"MentalConnection, Motherlobe_Access, ThoughtTuner"
 44,Motherlobe,NULL,ML_PsyChallengeMarkers6_Check,Bowling Alley,"Motherlobe_Access, Senior_League_Card"
 45,Motherlobe,NULL,ML_PsyChallengeMarkers7_Check,Mailroom,Motherlobe_Access
 46,Motherlobe,NULL,ML_PsyChallengeMarkers8_Check,Mailroom 2 behind door,"Projection, Motherlobe_Access"
@@ -80,9 +80,9 @@ Index,Location,Section,Check,Name,Item_Required
 78,Quarry,NULL,Quarry_SupplyKey2_check,Dam Generator Key,Quarry_Access
 79,Quarry,NULL,Quarry_SupplyKey3_check,Otto's Lab Exterior Key,Quarry_Access
 80,Quarry,NULL,Quarry_SupplyKey4_check,Otto's Lab Fan Key,"TimeBubble, Quarry_Access"
-81,Quarry,NULL,Quarry_PsyChallengeMarkers1_check,Pirate Radio Mental Connection,"MentalConnection, Quarry_Access, Thought_Tuner"
-82,Quarry,NULL,Quarry_PsyChallengeMarkers2_check,Otto's Workshop Mental Connection,"MentalConnection, Quarry_Access, Thought_Tuner"
-83,Quarry,NULL,Quarry_PsyChallengeMarkers3_check,Behind Motherlobe Mental Connection,"MentalConnection, Quarry_Access, Thought_Tuner"
+81,Quarry,NULL,Quarry_PsyChallengeMarkers1_check,Pirate Radio Mental Connection,"MentalConnection, Quarry_Access, ThoughtTuner"
+82,Quarry,NULL,Quarry_PsyChallengeMarkers2_check,Otto's Workshop Mental Connection,"MentalConnection, Quarry_Access, ThoughtTuner"
+83,Quarry,NULL,Quarry_PsyChallengeMarkers3_check,Behind Motherlobe Mental Connection,"MentalConnection, Quarry_Access, ThoughtTuner"
 84,Quarry,NULL,Quarry_PsyChallengeMarkers4_check,Dam Cage,Quarry_Access
 85,Quarry,NULL,Quarry_PsyChallengeMarkers5_check,Top of Psychoisolation,"Levitation, Quarry_Access"
 86,Quarry,NULL,Laserdisc_check,Agent Orientation Laserdisc,"Levitation, Quarry_Access"
@@ -96,10 +96,10 @@ Index,Location,Section,Check,Name,Item_Required
 94,Questionable Area,NULL,QA_PsiCard4_check,Between Lumberstack and Tent,QA_Access
 95,Questionable Area,NULL,QA_PsiCard5_check,Secret Lumberstack Cave,QA_Access
 96,Questionable Area,NULL,QA_PsiCard6_check,Family Camping sign,QA_Access
-97,Questionable Area,NULL,QA_PsiCard7_check,Tree outside Lumberstack flagpole,"MentalConnection, QA_Access, Thought_Tuner"
+97,Questionable Area,NULL,QA_PsiCard7_check,Tree outside Lumberstack flagpole,"MentalConnection, QA_Access, ThoughtTuner"
 98,Questionable Area,NULL,QA_PsiCard8_check,Sassclops Cave stone,QA_Access
 99,Questionable Area,NULL,QA_PsiCard9_check,Sassclops Cave poster,QA_Access
-100,Questionable Area,NULL,QA_PsiCard10_check,PSI Challenge Card behind poster,"Levitation, PyroKinesis, QA_Access"
+100,Questionable Area,NULL,QA_PsiCard10_check,PSI Challenge Card behind poster,"Levitation, Pyrokinesis, QA_Access"
 101,Questionable Area,NULL,QA_PsiCard11_check,Water Wheel,"TimeBubble, QA_Access"
 102,Questionable Area,NULL,QA_PsiCard12_check,Playground Springs,QA_Access
 103,Questionable Area,NULL,QA_PsiCard13_check,Giant Log Campfire Entrance,QA_Access
@@ -119,22 +119,22 @@ Index,Location,Section,Check,Name,Item_Required
 117,Questionable Area,NULL,QA_PsiCard27_check,Trapeze near Funicular,"Telekinesis or TimeBubble, QA_Access"
 118,Questionable Area,NULL,QA_SupplyChests1_check,Secret Lumberstack Cave,QA_Access
 119,Questionable Area,NULL,QA_SupplyChests2_check,Sassclops Cave Exit,QA_Access
-120,Questionable Area,NULL,QA_SupplyChests3_check,Aquato Camp,"Levitation, PyroKinesis, QA_Access"
+120,Questionable Area,NULL,QA_SupplyChests3_check,Aquato Camp,"Levitation, Pyrokinesis, QA_Access"
 121,Questionable Area,NULL,QA_SupplyChests4_check,Fungus Cave,"TimeBubble, QA_Access"
 122,Questionable Area,NULL,QA_SupplyKey1_check,Questionable Area Entrance Cave,QA_Access
-123,Questionable Area,NULL,QA_SupplyKey2_check,Aquato Camp Key,"Levitation, PyroKinesis, QA_Access"
+123,Questionable Area,NULL,QA_SupplyKey2_check,Aquato Camp Key,"Levitation, Pyrokinesis, QA_Access"
 124,Questionable Area,NULL,QA_SupplyKey3_check,Near Funicular Key,QA_Access
 125,Questionable Area,NULL,QA_SupplyKey4_check,Behind Rundown Cabin Key,"Telekinesis or TimeBubble, QA_Access"
 126,Questionable Area,NULL,QA_PsyChallengeMarkers1_check,Lamberstack Diner Sign,"PsiBlast, QA_Access"
 127,Questionable Area,NULL,QA_PsyChallengeMarkers2_check,Sassclops Cave behind poster,"Pyrokinesis, QA_Access"
-128,Questionable Area,NULL,QA_PsyChallengeMarkers3_check,Above Playground,"MentalConnection, Thought_Tuner, QA_Access"
+128,Questionable Area,NULL,QA_PsyChallengeMarkers3_check,Above Playground,"MentalConnection, ThoughtTuner, QA_Access"
 129,Questionable Area,NULL,QA_PsyChallengeMarkers4_check,Aquatodome Interior,"PsiBlast, QA_Access"
 130,Questionable Area,NULL,QA_PsyChallengeMarkers5_check,Aquatodome Exterior,"PsiBlast, QA_Access"
 131,Questionable Area,NULL,QA_PsyChallengeMarkers6_check,Rundown Cabin,"Telekinesis or TimeBubble, QA_Access"
-132,Questionable Area,NULL,QA_PsyChallengeMarkers7_check,Queepie's Quest,"Levitation, PyroKinesis, QA_Access"
+132,Questionable Area,NULL,QA_PsyChallengeMarkers7_check,Queepie's Quest,"Levitation, Pyrokinesis, QA_Access"
 133,Questionable Area,NULL,Human_Skull_check,Human Skull,"Telekinesis, QA_Access"
 134,Questionable Area,NULL,Novelty_Mug_check,Novelty Mug,"Projection, QA_Access"
-135,Questionable Area,NULL,Can_of_Corn_check,Can of Corn,"Levitation, PyroKinesis, QA_Access"
+135,Questionable Area,NULL,Can_of_Corn_check,Can of Corn,"Levitation, Pyrokinesis, QA_Access"
 136,Questionable Area,NULL,Switchblade_Hatchet_check,Switchblade Hatchet,"TimeBubble, QA_Access"
 137,Questionable Area,NULL,Psychoseismonitor2_check,Trees above Campfire Psychoseismonitor,"Levitation, QA_Access"
 138,Questionable Area,NULL,Psychoseismonitor3_check,Secret Cave near family camp Psychoseismonitor,QA_Access
@@ -171,8 +171,8 @@ Index,Location,Section,Check,Name,Item_Required
 169,Green Needle Gulch,NULL,GNG_SupplyChests2_check,Cassie's House,"Telekinesis, Projection, GNG_Access"
 170,Green Needle Gulch,NULL,GNG_SupplyKey1_check,Otto's Workshop key,GNG_Access
 171,Green Needle Gulch,NULL,GNG_SupplyKey2_check,Beaver Wood Pile key,"Clairvoyance, GNG_Access"
-172,Green Needle Gulch,NULL,GNG_PsyChallengeMarkers1_check,Hollow stump in swamp,"MentalConnection, GNG_Access, Thought_Tuner"
-173,Green Needle Gulch,NULL,GNG_PsyChallengeMarkers2_check,Treehouse above Ford's office,"Levitation, MentalConnection, GNG_Access, Thought_Tuner"
+172,Green Needle Gulch,NULL,GNG_PsyChallengeMarkers1_check,Hollow stump in swamp,"MentalConnection, GNG_Access, ThoughtTuner"
+173,Green Needle Gulch,NULL,GNG_PsyChallengeMarkers2_check,Treehouse above Ford's office,"Levitation, MentalConnection, GNG_Access, ThoughtTuner"
 174,Green Needle Gulch,NULL,GNG_PsyChallengeMarkers3_check,Outhouse,"Projection, GNG_Access"
 175,Green Needle Gulch,NULL,GNG_PsyChallengeMarkers4_check,Psychoisolation Chamber,GNG_Access
 176,Green Needle Gulch,NULL,MurderBot_check,Mini Murder Bug Bot,GNG_Access
