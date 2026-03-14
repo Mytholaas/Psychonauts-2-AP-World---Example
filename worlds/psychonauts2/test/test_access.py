@@ -293,6 +293,37 @@ class TestItemPoolSize(Psy2TestBase):
             "GNG_Access (Important + forced-progression) should be progression",
         )
 
+    def test_thought_tuner_and_otto_shot_progression_not_win_required(self) -> None:
+        """ThoughtTuner and Otto-Shot gate checks (progression) but are not needed to win.
+
+        They must be classified as progression so that state.has() can track them
+        for the checks they lock.  However, neither item should appear in any
+        win condition's required-items list.
+        """
+        from worlds.psychonauts2.items import item_classifications, WIN_CONDITION_REQUIRED_ITEMS
+        for display_name in ("Thought Tuner", "Otto-Shot"):
+            cls = item_classifications.get(display_name)
+            self.assertEqual(
+                cls,
+                ItemClassification.progression,
+                f"{display_name} must be progression so state.has() works for locked checks",
+            )
+            for col, required in WIN_CONDITION_REQUIRED_ITEMS.items():
+                self.assertNotIn(
+                    display_name, required,
+                    f"{display_name} must not be required for win condition '{col}'",
+                )
+
+    def test_otto_spot_is_filler(self) -> None:
+        """Otto-Spot is a junk item and must be classified as filler."""
+        from worlds.psychonauts2.items import item_classifications
+        cls = item_classifications.get("Otto-Spot")
+        self.assertEqual(
+            cls,
+            ItemClassification.filler,
+            "Otto-Spot should be filler/junk",
+        )
+
     def test_location_names_unique(self) -> None:
         """All 607 randomised location names must be unique."""
         locations = [loc for loc in self.multiworld.get_locations(self.player) if not loc.is_event]
