@@ -71,6 +71,7 @@ from .items import (
     VICTORY_ITEM_NAME,
     MALIGULA_ACCESS_ITEM_NAME,
     OUTFIT_ITEM_KEYS,
+    SHOP_ITEM_DISPLAY_NAMES,
 )
 from .locations import (
     Psy2Location,
@@ -83,7 +84,7 @@ from .locations import (
     LocationData,
     STORY_COMPLETE_EVENTS,
 )
-from .options import Psy2Options, WinCondition, StartingOutfit
+from .options import Psy2Options, WinCondition, StartingOutfit, IncludeShopItems
 from .rules import set_rules
 
 if TYPE_CHECKING:
@@ -181,10 +182,13 @@ class Psy2World(World):
           2. Exclude Melee - Base Power from the pool (it is always precollected).
           3. Start with the base pool from the CSV (respecting Max_Quantity),
              skipping the chosen starting outfit and Melee base.
-          4. Promote items required by the chosen win condition to Required
+          4. When IncludeShopItems is disabled, also skip items whose origin
+             is Otto's shop (pins, consumables, inventory pouches, and filters).
+          5. Promote items required by the chosen win condition to Required
              (ItemClassification.progression).
-          5. Pad or trim the pool to exactly match the number of randomised
-             locations, using weighted junk filler.
+          6. Pad or trim the pool to exactly match the number of randomised
+             locations (which itself reflects the IncludeShopItems setting),
+             using weighted junk filler.
 
         Both the starting outfit and Melee are pushed as precollected items so
         that access rules referencing them are satisfied from the start.
@@ -202,13 +206,27 @@ class Psy2World(World):
         # Names of items to precollect instead of placing in the pool.
         precollected_displays = {starting_outfit_display, melee_display}
 
+        # Shop items to skip when the player has disabled shop checks.
+        skip_shop = not bool(self.options.include_shop_items)
+
         required_names = set(self._get_required_item_names())
-        target_count = len(all_randomised_locations)
+        # Number of locations that will hold RANDOMISED items.
+        # When shop is disabled, shop locations are locked with vanilla items
+        # in generate_basic() and do NOT consume a pool slot.
+        if skip_shop:
+            target_count = sum(
+                1 for loc in self.all_location_data if loc.region != "Shop"
+            )
+        else:
+            target_count = len(self.all_location_data)
 
         items: List[Psy2Item] = []
         for display_name, default_classification in base_item_pool:
-            # Items precollected as start inventory are not placed in the pool.
-            if display_name in precollected_displays:
+            # Skip items that are pre-collected or, when shop is disabled,
+            # originate from the shop (they will be locked in generate_basic).
+            if display_name in precollected_displays or (
+                skip_shop and display_name in SHOP_ITEM_DISPLAY_NAMES
+            ):
                 continue
             if display_name in required_names:
                 classification = ItemClassification.progression
@@ -272,8 +290,10 @@ class Psy2World(World):
         enter.  The Global region (rank points, ability checks) requires no
         access item.
 
-        All 607 randomised check locations and the single victory event
-        location are created and assigned to their regions.
+        All randomised check locations are created and assigned to their regions.
+        Shop locations always exist regardless of the IncludeShopItems setting;
+        when that option is disabled they receive locked vanilla items in
+        generate_basic() rather than randomised items.
         """
         # Build the set of all region names present in the data
         region_names = set(AREA_TO_REGION.values())
@@ -305,7 +325,7 @@ class Psy2World(World):
                     lambda state, name=access_display, p=self.player: state.has(name, p)
                 )
 
-        # Populate locations in each region.
+        # Populate locations in each region (all locations, including Shop).
         self.all_location_data = []
         for loc_data in all_randomised_locations:
             region = created_regions.get(loc_data.region, created_regions["Global"])
@@ -356,6 +376,10 @@ class Psy2World(World):
         Events placed:
           - Maligula Complete  → victory location (Green Needle Gulch)
           - {World} Complete   → 13 StoryComplete event locations (Global region)
+
+        When IncludeShopItems is disabled, each shop check location receives
+        its vanilla item as a locked placement so the player obtains the normal
+        shop reward automatically without it being randomised.
         """
         # ── Victory event ────────────────────────────────────────────────────
         victory_item = Psy2Item(
@@ -381,6 +405,30 @@ class Psy2World(World):
             event_loc = self.multiworld.get_location(event_loc_name, self.player)
             event_loc.place_locked_item(event_item)
 
+        # ── Vanilla shop items (when shop randomisation is disabled) ─────────
+        # When IncludeShopItems is off, each shop check location is locked with
+        # the item that is normally sold there, so the mod delivers the vanilla
+        # reward when the player accesses that shop slot.
+        if not bool(self.options.include_shop_items):
+            for loc_data in self.all_location_data:
+                if loc_data.region != "Shop":
+                    continue
+                # Derive the item key from the check key (strip "_check" suffix).
+                check_key = loc_data.check_key
+                item_key = check_key[:-6] if check_key.endswith("_check") else check_key
+                item_display = csv_key_to_display_name.get(item_key, item_key)
+                classification = item_classifications.get(
+                    item_display, ItemClassification.filler
+                )
+                vanilla_item = Psy2Item(
+                    item_display,
+                    classification,
+                    item_name_to_id.get(item_display),
+                    self.player,
+                )
+                loc = self.multiworld.get_location(loc_data.name, self.player)
+                loc.place_locked_item(vanilla_item)
+
         # ── Win condition ─────────────────────────────────────────────────────
         # The seed is beaten when the player collects the victory event item.
         self.multiworld.completion_condition[self.player] = lambda state: state.has(
@@ -395,10 +443,11 @@ class Psy2World(World):
         """
         Return data that the Psychonauts 2 AP mod client will use at runtime.
 
-        win_condition    – integer value of the chosen WinCondition option
-        required_items   – list of item display names that must be obtained
-        starting_outfit  – display name of the outfit the player starts with
-        death_link       – whether death-link is enabled
+        win_condition      – integer value of the chosen WinCondition option
+        required_items     – list of item display names that must be obtained
+        starting_outfit    – display name of the outfit the player starts with
+        include_shop_items – whether shop check locations are in the world
+        death_link         – whether death-link is enabled
         """
         col = _WIN_COND_TO_COL.get(
             self.options.win_condition.value, "WinCondition_Normal"
@@ -411,5 +460,6 @@ class Psy2World(World):
             "win_condition": self.options.win_condition.value,
             "required_items": WIN_CONDITION_REQUIRED_ITEMS.get(col, []),
             "starting_outfit": starting_outfit_display,
+            "include_shop_items": bool(self.options.include_shop_items),
             "death_link": bool(self.options.death_link.value),
         }

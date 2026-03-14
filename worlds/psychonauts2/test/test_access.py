@@ -200,10 +200,10 @@ class TestItemPoolSize(Psy2TestBase):
     """Tests that verify the item pool is correctly sized."""
 
     def test_pool_matches_location_count(self) -> None:
-        """The item pool must have exactly as many items as there are randomised locations."""
-        location_count = len([
+        """The item pool must have exactly as many items as unfilled randomised locations."""
+        unfilled_count = len([
             loc for loc in self.multiworld.get_locations(self.player)
-            if not loc.is_event
+            if not loc.is_event and loc.item is None
         ])
         item_count = len([
             item for item in self.multiworld.itempool
@@ -211,8 +211,8 @@ class TestItemPoolSize(Psy2TestBase):
         ])
         self.assertEqual(
             item_count,
-            location_count,
-            f"Item pool ({item_count}) should match location count ({location_count})",
+            unfilled_count,
+            f"Item pool ({item_count}) should match unfilled location count ({unfilled_count})",
         )
 
     def test_victory_event_exists(self) -> None:
@@ -412,13 +412,145 @@ class TestStartingOutfitSuit(Psy2TestBase):
         self.assertNotIn("Suit", pool_names)
 
     def test_pool_still_matches_locations(self) -> None:
-        """Pool size must equal location count regardless of starting outfit."""
-        location_count = len([
+        """Pool size must equal unfilled location count regardless of starting outfit."""
+        unfilled_count = len([
             loc for loc in self.multiworld.get_locations(self.player)
-            if not loc.is_event
+            if not loc.is_event and loc.item is None
         ])
         item_count = len([
             item for item in self.multiworld.itempool
             if item.player == self.player
         ])
-        self.assertEqual(item_count, location_count)
+        self.assertEqual(item_count, unfilled_count)
+
+
+class TestToggleablePinClassification(Psy2TestBase):
+    """Tests that the nine toggleable pins have the 'useful' classification."""
+
+    def test_toggleable_pins_are_useful(self) -> None:
+        """Each of the nine toggleable pins must be classified as useful."""
+        from worlds.psychonauts2.items import item_classifications
+        toggleable_pin_names = [
+            "Gag Order", "Pixel Pal", "Food for Thought", "Mental Tax",
+            "Rainblows", "Bobby Pin", "Mental Magnet", "VIP Discount",
+            "Beastmastery",
+        ]
+        for name in toggleable_pin_names:
+            cls = item_classifications.get(name)
+            self.assertEqual(
+                cls,
+                ItemClassification.useful,
+                f"{name!r} should be classified as useful (toggleable pin)",
+            )
+
+    def test_non_toggleable_shop_pins_are_filler(self) -> None:
+        """Pins that are NOT in the toggleable set should remain filler."""
+        from worlds.psychonauts2.items import item_classifications
+        non_toggleable_pins = [
+            "Psi Clone", "Wastepaper", "Heavy Thought", "Brain Drain",
+            "Mental Block", "Speed Reader", "Strike-onaut", "Goo Proof",
+            "Glass Cannon", "Psimultanium",
+        ]
+        for name in non_toggleable_pins:
+            cls = item_classifications.get(name)
+            self.assertEqual(
+                cls,
+                ItemClassification.filler,
+                f"{name!r} should remain filler (non-toggleable pin)",
+            )
+
+
+class TestShopItemsDisabled(Psy2TestBase):
+    """Tests with IncludeShopItems disabled (include_shop_items: 0).
+
+    When the option is off, shop locations still exist but receive locked
+    vanilla items instead of randomised ones.  The item pool is sized to
+    cover only the non-shop locations.
+    """
+    options = {"include_shop_items": 0}
+
+    def test_shop_locations_still_exist(self) -> None:
+        """Shop check locations must still be present in the world when shop is off."""
+        location_names = {
+            loc.name
+            for loc in self.multiworld.get_locations(self.player)
+            if not loc.is_event
+        }
+        for shop_loc_name in ("Beastmastery", "Gag Order", "Psi Core", "Mind's Eyelets"):
+            self.assertIn(
+                shop_loc_name, location_names,
+                f"{shop_loc_name!r} should still exist as a location when shop is off",
+            )
+
+    def test_shop_locations_have_locked_vanilla_items(self) -> None:
+        """Each shop location must have its vanilla item locked (not randomised)."""
+        for loc_name, expected_item in (
+            ("Gag Order",    "Gag Order"),
+            ("Beastmastery", "Beastmastery"),
+            ("VIP Discount", "VIP Discount"),
+            ("Psi Core",     "Psi Core"),
+            ("Otto-Spot",    "Otto-Spot"),
+        ):
+            loc = self.multiworld.get_location(loc_name, self.player)
+            self.assertIsNotNone(
+                loc.item,
+                f"{loc_name!r} location should have a locked item when shop is off",
+            )
+            self.assertEqual(
+                loc.item.name, expected_item,
+                f"{loc_name!r} should contain the vanilla item {expected_item!r}",
+            )
+
+    def test_shop_items_not_in_randomised_pool(self) -> None:
+        """Shop items must not appear as randomised pool items when shop is off."""
+        pool_names = {i.name for i in self.multiworld.itempool if i.player == self.player}
+        for pin_name in (
+            "Gag Order", "Pixel Pal", "Food for Thought", "Mental Tax",
+            "Rainblows", "Bobby Pin", "Mental Magnet", "VIP Discount",
+            "Beastmastery", "Psi Clone", "Wastepaper",
+        ):
+            self.assertNotIn(
+                pin_name, pool_names,
+                f"{pin_name!r} should not be in the randomised pool when shop is off",
+            )
+
+    def test_non_shop_items_still_in_pool(self) -> None:
+        """Progression and hub-area items unrelated to the shop must still appear."""
+        pool_names = {i.name for i in self.multiworld.itempool if i.player == self.player}
+        for item_name in (
+            "Intern Sticker",           # Motherlobe access
+            "Thinkerprint Full Access", # Quarry access
+            "Progressive Telekinesis",  # Ability
+        ):
+            self.assertIn(
+                item_name, pool_names,
+                f"{item_name!r} should still be in pool when shop is off",
+            )
+
+    def test_pool_matches_unfilled_location_count_without_shop(self) -> None:
+        """Item pool size must equal only the UNFILLED (non-locked) location count."""
+        unfilled_count = len([
+            loc for loc in self.multiworld.get_locations(self.player)
+            if not loc.is_event and loc.item is None
+        ])
+        item_count = len([
+            item for item in self.multiworld.itempool
+            if item.player == self.player
+        ])
+        self.assertEqual(
+            item_count, unfilled_count,
+            f"Pool ({item_count}) should match unfilled locations ({unfilled_count}) with shop off",
+        )
+
+    def test_shop_item_count_locked_not_in_pool(self) -> None:
+        """Number of locked shop locations should equal the known shop check count (48)."""
+        locked_shop_count = sum(
+            1
+            for loc in self.multiworld.get_locations(self.player)
+            if not loc.is_event and loc.item is not None
+            # exclude StoryComplete/victory events (they have is_event=True)
+        )
+        self.assertEqual(
+            locked_shop_count, 48,
+            f"Expected 48 locked shop locations, found {locked_shop_count}",
+        )

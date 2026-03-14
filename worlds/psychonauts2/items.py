@@ -165,6 +165,26 @@ FILLER_ITEM_KEYS: List[str] = [
 ]
 
 # ---------------------------------------------------------------------------
+# Toggleable-pin classification override
+# ---------------------------------------------------------------------------
+
+# These nine pins can be freely equipped and unequipped from within the game
+# once the player has obtained them (handled on the UE4 mod side).  Because
+# they provide an ongoing, player-controlled benefit they are classified as
+# *useful* rather than *filler*, even though they do not gate any checks.
+TOGGLEABLE_PIN_KEYS: frozenset[str] = frozenset({
+    "GagOrder",
+    "PixelPal",
+    "FoodForThought",
+    "MentalTax",
+    "Rainblows",
+    "BobbyPin",
+    "MentalMagnet",
+    "VIPDiscount",
+    "Beastmastery",
+})
+
+# ---------------------------------------------------------------------------
 # Forced-progression override
 # ---------------------------------------------------------------------------
 
@@ -177,7 +197,7 @@ FILLER_ITEM_KEYS: List[str] = [
 # (see _classification_from_csv).  Every item key that appears as a requirement
 # in the check CSV therefore needs an explicit progression override so
 # state.has() can recognise it.
-_FORCED_PROGRESSION_KEYS: frozenset = frozenset({
+_FORCED_PROGRESSION_KEYS: frozenset[str] = frozenset({
     # ── Hub-area access items (Normal in the CSV) ────────────────────────────
     "Motherlobe_Access",
     "Quarry_Access",
@@ -312,14 +332,15 @@ def _read_item_rows() -> List[Dict[str, str]]:
 
 
 def _build_tables() -> Tuple[
-    Dict[str, Optional[int]],   # item_name_to_id
-    Dict[str, ItemClassification],  # item_classifications
-    List[str],                  # filler_item_names
+    Dict[str, Optional[int]],          # item_name_to_id
+    Dict[str, ItemClassification],     # item_classifications
+    List[str],                         # filler_item_names
     List[Tuple[str, ItemClassification]],  # base_item_pool entries
-    Dict[str, str],             # csv_key_to_display_name
+    Dict[str, str],                    # csv_key_to_display_name
+    Set[str],                          # shop_item_display_names
 ]:
     """
-    Parse the item CSV and build the four primary data structures.
+    Parse the item CSV and build the primary data structures.
 
     Returns
     -------
@@ -335,6 +356,10 @@ def _build_tables() -> Tuple[
     csv_key_to_display_name
         {csv_item_key: display_name} used by the rules module to translate
         requirement strings.
+    shop_item_display_names
+        Set of display names whose Normal_Location is "Shop" in the item CSV.
+        Used by __init__.py to filter items out of the pool when
+        IncludeShopItems is disabled.
     """
     rows = _read_item_rows()
 
@@ -350,6 +375,7 @@ def _build_tables() -> Tuple[
     filler_item_names: List[str] = []
     base_item_pool: List[Tuple[str, ItemClassification]] = []
     csv_key_to_display: Dict[str, str] = {}
+    shop_item_display_names: Set[str] = set()
 
     for row in rows:
         key: str = row["Item"]
@@ -382,10 +408,18 @@ def _build_tables() -> Tuple[
             # can track them, regardless of their CSV type.
             if key in _FORCED_PROGRESSION_KEYS:
                 classification = ItemClassification.progression
+            elif key in TOGGLEABLE_PIN_KEYS:
+                # Toggleable pins can be freely equipped/unequipped in-game;
+                # they are beneficial but never required for progression.
+                classification = ItemClassification.useful
             else:
                 classification = _classification_from_csv(row["Item_Type"])
 
         csv_key_to_display[key] = display_name
+
+        # ── Track shop-origin items for optional filtering ───────────────────
+        if row.get("Normal_Location") == "Shop":
+            shop_item_display_names.add(display_name)
 
         # ── Determine ID (progressive groups share the first item's index) ───
         if display_name not in item_name_to_id:
@@ -415,6 +449,7 @@ def _build_tables() -> Tuple[
         filler_item_names,
         base_item_pool,
         csv_key_to_display,
+        shop_item_display_names,
     )
 
 
@@ -425,6 +460,7 @@ def _build_tables() -> Tuple[
     filler_item_names,
     base_item_pool,
     csv_key_to_display_name,
+    SHOP_ITEM_DISPLAY_NAMES,
 ) = _build_tables()
 
 

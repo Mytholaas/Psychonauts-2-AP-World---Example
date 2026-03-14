@@ -27,7 +27,7 @@ Starting outfit
 """
 
 from dataclasses import dataclass
-from Options import Choice, DeathLink, PerGameCommonOptions
+from Options import Choice, DeathLink, PerGameCommonOptions, Toggle
 
 
 class WinCondition(Choice):
@@ -86,8 +86,31 @@ class StartingOutfit(Choice):
     default = 0
 
 
+class IncludeShopItems(Toggle):
+    """
+    Include Otto's shop checks and shop items in the randomised pool.
+
+    On (default)
+        All 48 shop check locations (Pins, Consumables, Psi Pouches, and
+        Otto-Shop Filters) are randomised, and the corresponding shop items
+        are eligible to appear at any check location in the world.
+
+    Off
+        All shop check locations receive their vanilla items as locked
+        placements (the item normally sold there is given automatically).
+        Shop items (pins, consumables, inventory pouches, and Otto-Shop
+        filter items) are removed from the randomised pool, and the pool
+        is padded with weighted filler instead.  Players still visit shop
+        slots and collect their normal rewards; those rewards are simply
+        not randomised.
+    """
+    display_name = "Include Shop Items"
+    default = 1
+
+
 @dataclass
 class Psy2Options(PerGameCommonOptions):
     win_condition: WinCondition
     starting_outfit: StartingOutfit
+    include_shop_items: IncludeShopItems
     death_link: DeathLink
