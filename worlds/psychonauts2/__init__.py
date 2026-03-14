@@ -70,6 +70,7 @@ from .items import (
     WIN_CONDITION_REQUIRED_ITEMS,
     VICTORY_ITEM_NAME,
     MALIGULA_ACCESS_ITEM_NAME,
+    OUTFIT_ITEM_KEYS,
 )
 from .locations import (
     Psy2Location,
@@ -82,7 +83,7 @@ from .locations import (
     LocationData,
     STORY_COMPLETE_EVENTS,
 )
-from .options import Psy2Options, WinCondition
+from .options import Psy2Options, WinCondition, StartingOutfit
 from .rules import set_rules
 
 if TYPE_CHECKING:
@@ -175,17 +176,40 @@ class Psy2World(World):
         Build the item pool for this player's world.
 
         Steps:
-          1. Start with the base pool from the CSV (respecting Max_Quantity).
-          2. Promote items required by the chosen win condition to Required
+          1. Determine which outfit the player starts with (from options) and
+             which outfit display name to exclude from the pool.
+          2. Exclude Melee - Base Power from the pool (it is always precollected).
+          3. Start with the base pool from the CSV (respecting Max_Quantity),
+             skipping the chosen starting outfit and Melee base.
+          4. Promote items required by the chosen win condition to Required
              (ItemClassification.progression).
-          3. Pad or trim the pool to exactly match the number of randomised
+          5. Pad or trim the pool to exactly match the number of randomised
              locations, using weighted junk filler.
+
+        Both the starting outfit and Melee are pushed as precollected items so
+        that access rules referencing them are satisfied from the start.
         """
+        # Determine which outfit CSV key the player is starting with.
+        starting_outfit_idx = self.options.starting_outfit.value
+        starting_outfit_key = OUTFIT_ITEM_KEYS[starting_outfit_idx]
+        starting_outfit_display = csv_key_to_display_name.get(
+            starting_outfit_key, starting_outfit_key
+        )
+
+        # Display name for Melee base (always precollected).
+        melee_display = csv_key_to_display_name.get("Melee", "Melee - Base Power")
+
+        # Names of items to precollect instead of placing in the pool.
+        precollected_displays = {starting_outfit_display, melee_display}
+
         required_names = set(self._get_required_item_names())
         target_count = len(all_randomised_locations)
 
         items: List[Psy2Item] = []
         for display_name, default_classification in base_item_pool:
+            # Items precollected as start inventory are not placed in the pool.
+            if display_name in precollected_displays:
+                continue
             if display_name in required_names:
                 classification = ItemClassification.progression
             else:
@@ -211,6 +235,15 @@ class Psy2World(World):
 
         for item in items:
             self.multiworld.itempool.append(item)
+
+        # Precollect the starting outfit and Melee so they are in the player's
+        # inventory from the first moment of the seed.
+        for display_name in precollected_displays:
+            precollected_item = self._create_item_with_classification(
+                display_name,
+                item_classifications.get(display_name, ItemClassification.filler),
+            )
+            self.multiworld.push_precollected(precollected_item)
 
     def get_filler_item_name(self) -> str:
         """Return a random junk item name for pool padding.
@@ -362,15 +395,21 @@ class Psy2World(World):
         """
         Return data that the Psychonauts 2 AP mod client will use at runtime.
 
-        win_condition   – integer value of the chosen WinCondition option
-        required_items  – list of item display names that must be obtained
-        death_link      – whether death-link is enabled
+        win_condition    – integer value of the chosen WinCondition option
+        required_items   – list of item display names that must be obtained
+        starting_outfit  – display name of the outfit the player starts with
+        death_link       – whether death-link is enabled
         """
         col = _WIN_COND_TO_COL.get(
             self.options.win_condition.value, "WinCondition_Normal"
         )
+        starting_outfit_key = OUTFIT_ITEM_KEYS[self.options.starting_outfit.value]
+        starting_outfit_display = csv_key_to_display_name.get(
+            starting_outfit_key, starting_outfit_key
+        )
         return {
             "win_condition": self.options.win_condition.value,
             "required_items": WIN_CONDITION_REQUIRED_ITEMS.get(col, []),
+            "starting_outfit": starting_outfit_display,
             "death_link": bool(self.options.death_link.value),
         }

@@ -197,7 +197,7 @@ Index,Normal_Location,Item,Name,Item_Required,Item_Type,Max_Quantity
 195,Hollis' Classroom,HC_HAM2,Hollis' Classroom Half-a-Mind 2,NULL,Normal,1
 196,Hollis' Classroom,HC_MemoryVault1,Hollis' Classroom Memory Vault 1,NULL,Normal,1
 197,Hollis' Classroom,HC_Hatbox_Tag,Hollis' Classroom Hatbox Tag,NULL,Normal,1
-198,Hollis' Classroom,HC_SteamerTrunk _Tag,Hollis' Classroom Steamer Trunk Tag,NULL,Normal,1
+198,Hollis' Classroom,HC_SteamerTrunk_Tag,Hollis' Classroom Steamer Trunk Tag,NULL,Normal,1
 199,Hollis' Classroom,HC_Hatbox,Hollis' Classroom Hatbox,NULL,Normal,1
 200,Hollis' Classroom,HC_SteamerTrunk,Hollis' Classroom Steamer Trunk,NULL,Normal,1
 201,Hollis' Hot Streak,HH_Nugget1,Hollis' Hot Streak Nugget of Wisdom 1,NULL,Normal,1
@@ -252,7 +252,7 @@ Index,Normal_Location,Item,Name,Item_Required,Item_Type,Max_Quantity
 250,Psi King's Sensorium,PsiKing_Dufflebag,Psi King's Sensorium Dufflebag,NULL,Normal,1
 251,Ford's Follicles,Ford_Nugget1,Ford's Follicles Nugget of Wisdom 1,NULL,Normal,1
 252,Ford's Follicles,Ford_HAM1,Ford's Follicles Half-a-Mind 1,NULL,Normal,1
-253,Ford's Follicles,Ford_MemoryVault1,Ford's Follicles  Memory Vault 1,NULL,Normal,1
+253,Ford's Follicles,Ford_MemoryVault1,Ford's Follicles Memory Vault 1,NULL,Normal,1
 254,Ford's Follicles,Ford_SteamerTrunk_Tag,Ford's Follicles Steamer Trunk Tag,NULL,Normal,1
 255,Ford's Follicles,Ford_SteamerTrunk,Ford's Follicles Steamer Trunk,NULL,Normal,1
 256,Strike City,StrikeCity_Nugget1,Strike City Nugget of Wisdom 1,NULL,Normal,1

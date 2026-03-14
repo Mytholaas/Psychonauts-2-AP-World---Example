@@ -25,7 +25,8 @@
 name: YourName
 game: Psychonauts 2
 Psychonauts 2:
-  win_condition: normal   # normal | all_bosses | all_scav_hunt | scav_hunt_and_maligula
+  win_condition: normal        # normal | all_bosses | all_scav_hunt | scav_hunt_and_maligula
+  starting_outfit: normal_outfit  # normal_outfit | tried_and_true | circus_skivvies | suit
   death_link: false
 ```
 
@@ -61,9 +62,23 @@ Psychonauts 2:
 | Option | Description |
 |--------|-------------|
 | **Normal** | Obtain the core psychic abilities (Telekinesis, Psi Blast, Pyrokinesis, Levitation, Mental Connection, Time Bubble), unlock Green Needle Gulch, Ford's Follicles, Strike City, Cruller's Correspondence, and Tomb of the Sharkophagus, then defeat Maligula. |
-| **All Bosses** | Obtain all eight psychic abilities, complete Hollis' Hot Streak, Compton's Cookoff, Bob's Bottles, and Cassie's Collection, collect the Maligula Fight Access item, then defeat Maligula. |
-| **All Scav Hunt** | Collect all 16 scavenger-hunt items AND the Maligula Fight Access item, then defeat Maligula. |
-| **Scav Hunt and Maligula** | Collect all 16 scavenger-hunt items (no separate Maligula Fight Access item required), then defeat Maligula. |
+| **All Bosses** | Obtain all eight psychic abilities, complete Hollis' Hot Streak, Compton's Cookoff, Bob's Bottles, and Cassie's Collection, trigger Maligula Access, then defeat Maligula. |
+| **All Scav Hunt** | Collect all 16 scavenger-hunt items, then defeat Maligula. |
+| **Scav Hunt and Maligula** | Collect all 16 scavenger-hunt items (this triggers Maligula Access automatically), then defeat Maligula. |
+
+---
+
+## Starting Outfit
+
+One of four outfits can be selected in the YAML to be pre-equipped at the start of the
+seed.  The remaining three outfits are shuffled into the randomised item pool.
+
+| Option | Outfit |
+|--------|--------|
+| `normal_outfit` *(default)* | Raz's default look from the start of the normal game. |
+| `tried_and_true` | The classic Psychonauts 1 outfit. |
+| `circus_skivvies` | Raz's circus performance costume. |
+| `suit` | A sharp-looking formal suit. |
 
 ---
 
@@ -86,6 +101,8 @@ The eight psychic abilities and three inventory-upgrade pairs work as progressiv
   Quarry, Questionable Area, or Green Needle Gulch) already unlocked.
 - Players spawn in the Collective Unconscious.
 - Mental Connection is *not* required to navigate the Collective Unconscious.
+- **Melee** (basic melee attacks) is always available from the start of every seed.
+  The three melee upgrades (Dodge Attack, Slap Happy, Shockwave) are randomised items.
 - **Smelling Salts** can be used to exit any mental world or the Collective
   Unconscious and will route the player to an available hub area.
   - Preferred exit target: the hub area (Motherlobe or Green Needle Gulch) where the

@@ -14,12 +14,25 @@ All items are loaded from the CSV data file.  The main transformations are:
     for the same reason.
 
   Event items
-    Maligula_Complete is the victory event; it has no numeric ID and is never
-    placed in the randomised pool.
+    Maligula_Complete (victory), Maligula_Access (triggered event), and all
+    13 StoryComplete keys have no numeric ID and are never placed in the
+    randomised pool.  They are placed as locked event items at dedicated event
+    locations.
+
+  Starting items
+    Melee - Base Power is always precollected; the player starts every seed
+    with it.  It is NOT placed in the randomised pool.  Melee upgrades are.
+
+  Starting outfit
+    One of four outfits (Normal Outfit, Tried and True, Circus Skivvies, Suit)
+    is precollected based on the StartingOutfit YAML option.  The remaining
+    three outfits are placed in the randomised pool.
 
   Extra items
     Senior_League_Card gates the Motherlobe Bowling Alley but was omitted from
-    the item CSV.  It is added here as a Normal (useful) item.
+    the item CSV.  Normal_Outfit is the player's default look; it is added so
+    all four outfits are symmetrically randomisable.  Psitanium x25/50/100 are
+    filler-only items used to pad the pool.
 
 Item ID base: 7_792_462
 """
@@ -213,6 +226,26 @@ _EXTRA_ITEM_ROWS: List[Dict[str, str]] = [
     {"Index": "559", "Item": "Psitanium_25",  "Name": "Psitanium x25",  "Item_Type": "Junk", "Max_Quantity": "0"},
     {"Index": "560", "Item": "Psitanium_50",  "Name": "Psitanium x50",  "Item_Type": "Junk", "Max_Quantity": "0"},
     {"Index": "561", "Item": "Psitanium_100", "Name": "Psitanium x100", "Item_Type": "Junk", "Max_Quantity": "0"},
+    # The fourth outfit (the default look the player normally starts with).
+    # It is added here so all four outfits are symmetrically items in the pool
+    # when the player does not choose to start with it equipped.
+    {"Index": "562", "Item": "Normal_Outfit", "Name": "Normal Outfit", "Item_Type": "Normal", "Max_Quantity": "1"},
+]
+
+# ---------------------------------------------------------------------------
+# Outfit items
+# ---------------------------------------------------------------------------
+
+# All four outfit CSV keys, in order matching the StartingOutfit option values:
+#   0 = Normal_Outfit   (the player's default look)
+#   1 = Classic_Outfit  ("Tried and True")
+#   2 = Circus_Outfit   ("Circus Skivvies")
+#   3 = Suit_Outfit     ("Suit")
+OUTFIT_ITEM_KEYS: List[str] = [
+    "Normal_Outfit",
+    "Classic_Outfit",
+    "Circus_Outfit",
+    "Suit_Outfit",
 ]
 
 # ---------------------------------------------------------------------------

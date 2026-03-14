@@ -310,3 +310,84 @@ class TestItemPoolSize(Psy2TestBase):
             len(set(item_name_to_id.keys())),
             "Duplicate item display names in item_name_to_id",
         )
+
+    def test_melee_is_precollected_not_in_pool(self) -> None:
+        """Melee - Base Power must be precollected and absent from the item pool."""
+        pool_names = {i.name for i in self.multiworld.itempool if i.player == self.player}
+        self.assertNotIn(
+            "Melee - Base Power", pool_names,
+            "Melee - Base Power should be a starting item, not in the randomised pool",
+        )
+        precoll_names = [i.name for i in self.multiworld.precollected_items[self.player]]
+        self.assertIn(
+            "Melee - Base Power", precoll_names,
+            "Melee - Base Power should be precollected",
+        )
+
+    def test_melee_gates_accessible_with_motherlobe(self) -> None:
+        """Checks gated by Melee must be reachable when Motherlobe_Access is held.
+
+        Since Melee is always precollected, no extra item should be needed for
+        the Melee requirement itself.
+        """
+        self.collect_by_name("Intern Sticker")
+        self.assertTrue(
+            self.can_reach_location("Rainblows"),
+            "Rainblows should be reachable with Intern Sticker (Melee is precollected)",
+        )
+
+    def test_default_outfit_precollected_others_in_pool(self) -> None:
+        """With the default StartingOutfit (Normal Outfit), Normal Outfit is precollected
+        and the other three outfits are in the randomised pool."""
+        from worlds.psychonauts2.items import OUTFIT_ITEM_KEYS, csv_key_to_display_name
+        outfit_names = [csv_key_to_display_name.get(k, k) for k in OUTFIT_ITEM_KEYS]
+        precoll_names = {i.name for i in self.multiworld.precollected_items[self.player]}
+        pool_names = {i.name for i in self.multiworld.itempool if i.player == self.player}
+
+        # Default option is index 0 → Normal Outfit
+        self.assertIn("Normal Outfit", precoll_names, "Normal Outfit should be precollected by default")
+        for outfit_name in outfit_names:
+            if outfit_name != "Normal Outfit":
+                self.assertIn(outfit_name, pool_names, f"{outfit_name} should be in the pool")
+
+
+class TestStartingOutfitTriedAndTrue(Psy2TestBase):
+    """Tests with 'Tried and True' selected as the starting outfit."""
+    options = {"starting_outfit": "tried_and_true"}
+
+    def test_tried_and_true_precollected(self) -> None:
+        """Tried and True should be in start inventory, not the pool."""
+        precoll_names = {i.name for i in self.multiworld.precollected_items[self.player]}
+        pool_names = {i.name for i in self.multiworld.itempool if i.player == self.player}
+        self.assertIn("Tried and True", precoll_names)
+        self.assertNotIn("Tried and True", pool_names)
+
+    def test_other_outfits_in_pool(self) -> None:
+        """The three non-chosen outfits must be in the randomised pool."""
+        pool_names = {i.name for i in self.multiworld.itempool if i.player == self.player}
+        for outfit_name in ("Normal Outfit", "Circus Skivvies", "Suit"):
+            self.assertIn(outfit_name, pool_names, f"{outfit_name} should be in pool")
+
+
+class TestStartingOutfitSuit(Psy2TestBase):
+    """Tests with 'Suit' selected as the starting outfit."""
+    options = {"starting_outfit": "suit"}
+
+    def test_suit_precollected(self) -> None:
+        """Suit should be in start inventory, not the pool."""
+        precoll_names = {i.name for i in self.multiworld.precollected_items[self.player]}
+        pool_names = {i.name for i in self.multiworld.itempool if i.player == self.player}
+        self.assertIn("Suit", precoll_names)
+        self.assertNotIn("Suit", pool_names)
+
+    def test_pool_still_matches_locations(self) -> None:
+        """Pool size must equal location count regardless of starting outfit."""
+        location_count = len([
+            loc for loc in self.multiworld.get_locations(self.player)
+            if not loc.is_event
+        ])
+        item_count = len([
+            item for item in self.multiworld.itempool
+            if item.player == self.player
+        ])
+        self.assertEqual(item_count, location_count)

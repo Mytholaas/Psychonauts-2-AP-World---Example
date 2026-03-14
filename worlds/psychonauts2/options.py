@@ -12,15 +12,18 @@ The four win conditions are:
 
   WinCondition_AllBosses
     Obtain all eight psychic abilities, complete four specific mental worlds,
-    collect the Maligula Fight Access item, then defeat Maligula.
+    trigger Maligula_Access, then defeat Maligula.
 
   WinCondition_AllScavHunt
-    Collect all 16 scavenger-hunt items, collect the Maligula Fight Access
-    item, then defeat Maligula.
+    Collect all 16 scavenger-hunt items, then defeat Maligula.
 
   WinCondition_ScavHunt_and_Maligula
-    Collect all 16 scavenger-hunt items, then defeat Maligula.
-    (Maligula Fight Access is not required as a separate item.)
+    Collect all 16 scavenger-hunt items to trigger Maligula_Access, then
+    defeat Maligula.
+
+Starting outfit
+  One of four outfits is chosen to be pre-equipped at the start of the seed.
+  The remaining three outfits are randomised into the world as items.
 """
 
 from dataclasses import dataclass
@@ -38,16 +41,15 @@ class WinCondition(Choice):
 
     All Bosses
         Obtain all eight psychic abilities, complete Hollis' Hot Streak,
-        Compton's Cookoff, Bob's Bottles, and Cassie's Collection, collect the
-        Maligula Fight Access item, and defeat Maligula.
+        Compton's Cookoff, Bob's Bottles, and Cassie's Collection, trigger
+        Maligula Access, and defeat Maligula.
 
-    All Scav Hunt (with Maligula access item)
-        Collect all 16 scavenger-hunt collectibles AND the Maligula Fight
-        Access item, then defeat Maligula.
+    All Scav Hunt
+        Collect all 16 scavenger-hunt collectibles, then defeat Maligula.
 
     Scav Hunt and Maligula
-        Collect all 16 scavenger-hunt collectibles (no separate Maligula
-        access item required), then defeat Maligula.
+        Collect all 16 scavenger-hunt collectibles (this triggers Maligula
+        Access automatically), then defeat Maligula.
     """
     display_name = "Win Condition"
     option_normal = 0
@@ -57,7 +59,35 @@ class WinCondition(Choice):
     default = 0
 
 
+class StartingOutfit(Choice):
+    """
+    Choose which outfit Raz starts the seed already wearing.
+
+    The chosen outfit is placed in Raz's starting inventory.  The remaining
+    three outfits are shuffled into the randomised item pool.
+
+    Normal Outfit
+        The default look Raz wears at the start of the normal game.
+
+    Tried and True
+        The classic Psychonauts 1 outfit.
+
+    Circus Skivvies
+        Raz's circus performance costume.
+
+    Suit
+        A sharp-looking formal suit.
+    """
+    display_name = "Starting Outfit"
+    option_normal_outfit = 0
+    option_tried_and_true = 1
+    option_circus_skivvies = 2
+    option_suit = 3
+    default = 0
+
+
 @dataclass
 class Psy2Options(PerGameCommonOptions):
     win_condition: WinCondition
+    starting_outfit: StartingOutfit
     death_link: DeathLink
