@@ -205,7 +205,7 @@ Index,Location,Section,Check,Name,Item_Required
 203,Hollis' Classroom,Morgue,HC_HAM2_check,Top Platform,"MentalConnection, HC_Access"
 204,Hollis' Classroom,Morgue,HC_MemoryVault1_check,Hallway to Chapel,"MentalConnection, HC_Access"
 205,Hollis' Classroom,Hospital Parking Lot,HC_Hatbox_Tag_check,"Right side roof, top of AC","MentalConnection, HC_Access"
-206,Hollis' Classroom,Hollis' Classroom,HC_SteamerTrunk _Tag_check,Back desk with boxes,HC_Access
+206,Hollis' Classroom,Hollis' Classroom,HC_SteamerTrunk_Tag_check,Back desk with boxes,HC_Access
 207,Hollis' Classroom,Hospital Parking Lot,HC_Hatbox_check,Right side near Trash Can,"MentalConnection, HC_Access"
 208,Hollis' Classroom,Hospital Parking Lot,HC_SteamerTrunk_check,"Left side roof, behind AC pipes","MentalConnection, HC_Access"
 209,Hollis' Classroom,NULL,HC_20PercentFigments,Hollis' Classroom,HC_Access

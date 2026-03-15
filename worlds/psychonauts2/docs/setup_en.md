@@ -4,56 +4,111 @@
 
 - [Psychonauts 2](https://store.steampowered.com/app/607080/) (PC / Game Pass version)
 - [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) (the server and client tools)
-- Psychonauts 2 Archipelago Mod (download from the mod's release page once available)
+- [UE4SS Experimental](https://github.com/UE4SS-RE/RE-UE4SS/releases) (Unreal Engine 4 Scripting System)
+- Psychonauts 2 Archipelago Mod (from this repository — see installation steps below)
 
 ---
 
 ## Installation Steps
 
-### 1 – Install the Psychonauts 2 Archipelago Mod
+### 1 – Install UE4SS
 
-1. Download the latest release of the Psychonauts 2 AP Mod.
-2. Extract the mod archive and copy its contents into the Psychonauts 2 game folder
-   (the same folder that contains `Psychonauts2.exe` or the equivalent launcher).
-3. The mod installs as an Unreal Engine 4 pak file; no additional tools are required.
+UE4SS is the Unreal Engine 4 scripting framework that runs the mod.
 
-### 2 – Configure Your Player YAML
+1. Download the latest **experimental** release of UE4SS from
+   <https://github.com/UE4SS-RE/RE-UE4SS/releases>.
+2. Extract the archive.  You will get several files including `UE4SS.dll`,
+   `UE4SS.pdb`, `dwmapi.dll`, `UE4SS-settings.ini`, and a `Mods` folder.
+3. Copy **all** of these files and folders into the Psychonauts 2 game root
+   (the folder that contains `Psychonauts2.exe` or the Game Pass launcher).
+4. Replace the `UE4SS-settings.ini` that came with UE4SS with the one from
+   this repository.  The repository version pins UE4SS to Unreal Engine 4.26
+   so it resolves the correct object offsets for Psychonauts 2.
 
-1. Generate a template YAML from the Archipelago website or use the following minimal example:
+> **Windows Store / Game Pass users:** The game executable may be in a different
+> location (e.g. `C:\XboxGames\Psychonauts 2\Content\Psychonauts2.exe`).
+> Place UE4SS files next to that executable.
 
-```yaml
-name: YourName
-game: Psychonauts 2
-Psychonauts 2:
-  win_condition: normal        # normal | all_bosses | all_scav_hunt | scav_hunt_and_maligula
-  starting_outfit: normal_outfit  # normal_outfit | tried_and_true | circus_skivvies | suit
-  death_link: false
-```
+### 2 – Install the Psychonauts 2 Archipelago Mod
 
-2. Save the YAML and upload it when creating your multiworld seed.
+1. In the game root, locate (or create) the `Mods` folder that UE4SS uses.
+2. Copy the `mod/Psychonauts2AP` folder from this repository into `Mods`:
 
-### 3 – Generate or Join a Seed
+   ```
+   Psychonauts2/
+   ├── Psychonauts2.exe
+   ├── UE4SS.dll
+   ├── UE4SS-settings.ini
+   ├── ap_config.json          ← copy from this repo root
+   └── Mods/
+       └── Psychonauts2AP/     ← copy from mod/ in this repo
+           ├── enabled.txt
+           └── Scripts/
+               ├── main.lua
+               ├── archipelago.lua
+               ├── items.lua
+               ├── locations.lua
+               ├── config.lua
+               └── save.lua
+   ```
 
-- **Hosting a game**: Upload all player YAML files to the Archipelago website and generate
-  a seed.  Start the Archipelago server with the resulting `.archipelago` file.
-- **Joining a game**: Obtain the server address and port from the host.
+3. Copy `ap_config.json` from the repository root into the game root folder
+   (next to `Psychonauts2.exe`).
 
-### 4 – Launch Psychonauts 2 with the Mod
+### 3 – Configure Your Connection (`ap_config.json`)
 
-1. Start Psychonauts 2 normally.  The AP mod will detect the Archipelago client
-   configuration file (`ap_config.json`) in the game folder.
-2. Edit `ap_config.json` to set your server address, slot name, and password:
+Edit `ap_config.json` in the game folder to match your Archipelago session:
 
 ```json
 {
-  "server": "archipelago.gg:12345",
+  "server": "archipelago.gg:38281",
   "slot_name": "YourName",
   "password": ""
 }
 ```
 
-3. When you load or start a new save, the mod will connect to the Archipelago server
-   automatically.
+| Field | Description |
+|-------|-------------|
+| `server` | Hostname and port of the Archipelago server (e.g. `"myserver.com:38281"`) |
+| `slot_name` | Your player name exactly as entered when the seed was generated |
+| `password` | Room password if the host set one; leave `""` for none |
+
+> If `ap_config.json` does not exist when the game starts, the mod will create
+> an example file automatically.  Edit it and restart the game.
+
+### 4 – Configure Your Player YAML
+
+Generate a template YAML from the Archipelago website or use the following
+minimal example:
+
+```yaml
+name: YourName
+game: Psychonauts 2
+Psychonauts 2:
+  win_condition: normal          # normal | all_bosses | all_scav_hunt | scav_hunt_and_maligula
+  starting_outfit: normal_outfit # normal_outfit | tried_and_true | circus_skivvies | suit
+  include_shop_items: true
+  death_link: false
+```
+
+Save the YAML and upload it when creating your multiworld seed.
+
+### 5 – Generate or Join a Seed
+
+- **Hosting a game**: Upload all player YAML files to the Archipelago website and generate
+  a seed.  Start the Archipelago server with the resulting `.archipelago` file.
+- **Joining a game**: Obtain the server address and port from the host, then update
+  your `ap_config.json` accordingly.
+
+### 6 – Launch Psychonauts 2 with the Mod
+
+1. Start Psychonauts 2 normally.
+2. UE4SS will automatically inject itself (via the `dwmapi.dll` proxy) and load
+   the Psychonauts2AP mod from the `Mods` folder.
+3. The mod reads `ap_config.json`, connects to the Archipelago server, and
+   begins the randomiser session.
+4. Load or start a save.  The mod will synchronise your collected items and
+   sent checks with the server automatically.
 
 ---
 
@@ -118,7 +173,24 @@ The eight psychic abilities and three inventory-upgrade pairs work as progressiv
 
 | Problem | Solution |
 |---------|----------|
-| Mod not loading | Verify the pak file is in the correct folder and that mod loading is enabled in game settings. |
-| Cannot connect to server | Check `ap_config.json` for correct server address, slot name, and password. |
-| Items not being sent/received | Ensure the Archipelago server is running and the game client shows "Connected". |
+| Mod not loading | Verify `UE4SS.dll` and `dwmapi.dll` are in the game root, `UE4SS-settings.ini` has `ModLoading=1`, and `Mods/Psychonauts2AP/enabled.txt` exists. |
+| Cannot connect to server | Check `ap_config.json` for the correct server address, slot name, and password. |
+| ap_config.json not found | The mod creates an example on first run — edit it and restart the game. |
+| Items not being sent/received | Ensure the Archipelago server is running.  The UE4SS console (enable via `DebugConsoleEnabled=1` in `UE4SS-settings.ini`) shows `[AP] Connected` on success. |
 | Stuck with no accessible checks | Use Smelling Salts to return to a hub area and look for accessible checks there. |
+| Game crashes on startup | Make sure you are using the UE4SS *experimental* release and that `UE4SS-settings.ini` pins `MajorVersion=4 MinorVersion=26`. |
+| DeathLink kills are not received | Ensure `death_link: true` is set in your YAML and the session was generated with that setting. |
+
+### Reading the UE4SS Console
+
+Enable the debug console by setting `DebugConsoleEnabled=1` in `UE4SS-settings.ini`.
+The mod prints status messages prefixed with `[AP]`:
+
+| Message | Meaning |
+|---------|---------|
+| `[AP] Config loaded — server=… slot=…` | `ap_config.json` was read successfully |
+| `[AP] TCP connected to …` | TCP socket connected; waiting for server response |
+| `[AP] Connected as … (slot …)` | Authenticated with the AP server |
+| `[AP] Check completed: … (id=…)` | A location check was sent to the server |
+| `[AP] Granting item: … (id=…)` | An item received from another player is being applied |
+| `[AP] Disconnected from server.` | Connection lost; will retry automatically |
