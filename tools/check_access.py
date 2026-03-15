@@ -1,9 +1,14 @@
-﻿import csv
+import csv
+import os
+
+# Script must be run from the repository root or the path adjusted accordingly
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 print("Checking mental world access items...")
 print("="*70)
 
-with open("worlds/psychonauts2/data/Psychonauts_2_Item_List.csv", "r", encoding="utf-8") as f:
+csv_path = os.path.join(REPO_ROOT, "worlds", "psychonauts2", "data", "Psychonauts_2_Item_List.csv")
+with open(csv_path, "r", encoding="utf-8") as f:
     items = list(csv.DictReader(f))
 
 access_items = [i for i in items if "_Access" in i["Item"]]
