@@ -681,6 +681,27 @@ function Items._grant_progressive_ability(prog_name)
     end
 end
 
+--- Re-apply a progressive ability to a specific saved tier without incrementing
+--- the counter.  Used on connect to restore ability levels after a game-save
+--- reset — analogous to OpenTTD v1.2.2's infrastructure-unlock re-apply fix.
+function Items._reapply_ability(prog_name, tier)
+    if tier <= 0 then return end
+    local tag = Items.ability_tags[prog_name]
+    if not tag then return end
+    Items.ability_tiers[prog_name] = tier
+    local raz = Items._get_raz()
+    if raz then
+        local ok, err = pcall(function()
+            raz.PsychicsComponent:SetAbilityTier(tag, tier)
+        end)
+        if not ok then
+            local gi = Items._get_game_instance()
+            if gi then pcall(function() gi:GrantAbility(tag, tier) end) end
+            print("[AP] Ability reapply fallback used for " .. prog_name .. ": " .. tostring(err))
+        end
+    end
+end
+
 function Items._grant_progressive_equipment(prog_name)
     local current   = Items.ability_tiers[prog_name]
     local next_tier = current + 1

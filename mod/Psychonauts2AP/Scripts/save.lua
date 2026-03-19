@@ -8,6 +8,9 @@
 ---   checked_locations  — set of location IDs already sent to the server
 ---   received_index     — index of the last item received from the server
 ---   ability_tiers      — current progressive-ability tier counts
+---   received_area_flags — set of area-access item names already received
+---                         (re-applied on every connect so unlocks survive
+---                          a fresh-game-save with an existing ap_save.json)
 ---   slot_data          — win-condition and option flags from the server
 
 local Save = {}
@@ -18,10 +21,11 @@ local SAVE_FILENAME = "ap_save.json"
 -- In-memory state
 -- ---------------------------------------------------------------------------
 
-Save.checked_locations = {}   -- { [loc_id] = true }
-Save.received_index    = 0    -- last processed ReceivedItems index
-Save.ability_tiers     = {}   -- { [prog_name] = tier_count }
-Save.slot_data         = {}   -- slot data received on connect
+Save.checked_locations  = {}   -- { [loc_id] = true }
+Save.received_index     = 0    -- last processed ReceivedItems index
+Save.ability_tiers      = {}   -- { [prog_name] = tier_count }
+Save.received_area_flags = {}  -- { [item_name] = true } area-access items received
+Save.slot_data          = {}   -- slot data received on connect
 
 -- ---------------------------------------------------------------------------
 -- Minimal JSON helpers (same approach as config.lua)
@@ -52,15 +56,24 @@ local function _encode(state)
     table.sort(tier_parts)
     table.insert(parts, '  "ability_tiers": {\n' .. table.concat(tier_parts, ",\n") .. "\n  }")
 
+    -- received_area_flags as a JSON array of strings
+    local flag_names = {}
+    for name, _ in pairs(state.received_area_flags or {}) do
+        table.insert(flag_names, '"' .. name:gsub('"', '\\"') .. '"')
+    end
+    table.sort(flag_names)
+    table.insert(parts, '  "received_area_flags": [' .. table.concat(flag_names, ", ") .. "]")
+
     return "{\n" .. table.concat(parts, ",\n") .. "\n}\n"
 end
 
 --- Parse the save file.  Returns a table with the expected fields.
 local function _decode(text)
     local result = {
-        checked_locations = {},
-        received_index    = 0,
-        ability_tiers     = {},
+        checked_locations   = {},
+        received_index      = 0,
+        ability_tiers       = {},
+        received_area_flags = {},
     }
 
     -- checked_locations array
@@ -82,6 +95,14 @@ local function _decode(text)
     if tiers_block then
         for name, tier in tiers_block:gmatch('"([^"]+)"%s*:%s*(%d+)') do
             result.ability_tiers[name] = tonumber(tier)
+        end
+    end
+
+    -- received_area_flags array of strings
+    local flags_array = text:match('"received_area_flags"%s*:%s*%[([^%]]*)%]')
+    if flags_array then
+        for name in flags_array:gmatch('"([^"]+)"') do
+            result.received_area_flags[name] = true
         end
     end
 
@@ -108,23 +129,28 @@ function Save.load()
         return false
     end
 
-    Save.checked_locations = data.checked_locations or {}
-    Save.received_index    = data.received_index    or 0
-    Save.ability_tiers     = data.ability_tiers     or {}
+    Save.checked_locations   = data.checked_locations   or {}
+    Save.received_index      = data.received_index      or 0
+    Save.ability_tiers       = data.ability_tiers       or {}
+    Save.received_area_flags = data.received_area_flags or {}
 
     local loc_count = 0
     for _ in pairs(Save.checked_locations) do loc_count = loc_count + 1 end
+    local flag_count = 0
+    for _ in pairs(Save.received_area_flags) do flag_count = flag_count + 1 end
     print("[AP] Loaded save: " .. loc_count .. " locations checked, "
-          .. "item index=" .. Save.received_index)
+          .. "item index=" .. Save.received_index .. ", "
+          .. flag_count .. " area flags")
     return true
 end
 
 --- Persist the current state to ap_save.json.
 function Save.write()
     local state = {
-        checked_locations = Save.checked_locations,
-        received_index    = Save.received_index,
-        ability_tiers     = Save.ability_tiers,
+        checked_locations   = Save.checked_locations,
+        received_index      = Save.received_index,
+        ability_tiers       = Save.ability_tiers,
+        received_area_flags = Save.received_area_flags,
     }
     local encoded = _encode(state)
     local fh, err = io.open(SAVE_FILENAME, "w")
@@ -163,12 +189,23 @@ function Save.set_ability_tier(prog_name, tier)
     Save.write()
 end
 
+--- Record that an area-access item has been received and persist.
+--- These flags are re-applied on every connect so that area unlocks survive
+--- a fresh game-save combined with an existing ap_save.json.
+function Save.set_area_flag(item_name)
+    if not Save.received_area_flags[item_name] then
+        Save.received_area_flags[item_name] = true
+        Save.write()
+    end
+end
+
 --- Reset all save state (used when starting a new seed).
 function Save.reset()
-    Save.checked_locations = {}
-    Save.received_index    = 0
-    Save.ability_tiers     = {}
-    Save.slot_data         = {}
+    Save.checked_locations   = {}
+    Save.received_index      = 0
+    Save.ability_tiers       = {}
+    Save.received_area_flags = {}
+    Save.slot_data           = {}
     Save.write()
     print("[AP] Save state reset.")
 end

@@ -205,6 +205,12 @@ local function _process_received_items(cmd)
         if item_name and Items.ability_tiers[item_name] ~= nil then
             Save.set_ability_tier(item_name, Items.ability_tiers[item_name])
         end
+
+        -- Record area-access items so they can be re-applied on future connects
+        -- (mirrors the OpenTTD v1.2.2 fix for unlocks lost after a save reset).
+        if item_name and Items.area_flags[item_name] then
+            Save.set_area_flag(item_name)
+        end
     end
 
     -- Advance our received-index pointer past everything in this batch
@@ -240,6 +246,21 @@ local function _apply_starting_state(slot_data)
     local starting_outfit = slot_data.starting_outfit
     if starting_outfit and Items.outfit_ids[starting_outfit] ~= nil then
         Items._grant_outfit(starting_outfit)
+    end
+
+    -- Re-apply all saved area-access items so that area unlocks survive a
+    -- fresh game-save combined with an existing ap_save.json.  This mirrors
+    -- the OpenTTD v1.2.2 fix for "infrastructure unlocks lost on reconnect".
+    for item_name, _ in pairs(Save.received_area_flags) do
+        Items._grant_area_access(item_name)
+    end
+
+    -- Re-apply all saved ability tiers so that abilities are at their correct
+    -- level even when the game save is newer or reset.
+    for prog_name, tier in pairs(Save.ability_tiers) do
+        if tier > 0 then
+            Items._reapply_ability(prog_name, tier)
+        end
     end
 end
 
